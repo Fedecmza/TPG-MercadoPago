@@ -19,7 +19,28 @@ app.use(session({
 }));
 
 // Step 2
-// app.use(???)
+app.use(require('./middlewares/cart'))
+
+//Código que deben colocar en el main.controller - método addCart
+    // Step 3
+    addCart: (req,res) => {
+        // Find Product in DB
+        let product = one(req.body.id)
+        // Check product exist in cart - Aquí lo programa diferente pero es lo mismo
+        if(req.session.cart.find(item => item.id == product.id)){
+            // Case 1: Exist and update quantity
+            req.session.cart = req.session.cart.map(item => {
+                if(item.id == product.id){
+                    item.quantity = item.quantity + 1
+                }
+                return item
+            })
+        }else{
+            // Case 2: Add cart and set quantity
+            req.session.cart.push({...product,quantity:1})
+        }
+        return res.redirect('/')
+    },
 
 app.use(require('./routes/main.routes'))
 app.use('/checkout',require('./routes/checkout.routes'))
